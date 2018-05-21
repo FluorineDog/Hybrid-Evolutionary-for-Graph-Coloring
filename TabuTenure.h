@@ -1,10 +1,10 @@
 #pragma once
 #include <cassert>
 #include "graph.h"
+#include "defines.h"
 
 class TabuTenure {
  public:
-  static constexpr int MAX_COLOR_COUNT = 61;
   TabuTenure() = default;
   void init(const Graph& graph, int color_count) {
     assert(color_count<= MAX_COLOR_COUNT);

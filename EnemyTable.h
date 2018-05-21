@@ -5,13 +5,13 @@
 #include <set>
 #include <vector>
 #include "graph.h"
+#include "defines.h"
 using std::make_tuple;
 using std::map;
 using std::pair;
 using std::set;
 using std::tuple;
 using std::vector;
-// #include "heap_del.h"
 
 constexpr int get2shift(int N) {
   int zeros = __builtin_clz(N - 1);
@@ -22,7 +22,6 @@ constexpr int INF = std::numeric_limits<int>::max() / 4;
 
 class EnemyTable {
  public:
-  static constexpr int MAX_VERTEX_COUNT = 509;
   EnemyTable() = default;
   EnemyTable(const EnemyTable&) = delete;
   EnemyTable(EnemyTable&&) = default;
@@ -37,9 +36,6 @@ class EnemyTable {
   int initBy(const Graph& graph, const vector<int>& colors) {
     m_table.clear();
     int v_count = graph.size();
-    // this->vertex_shift = get2shift(v_count);
-    // TODO
-    // int color_count = graph.get_color_count();
     m_table.resize(MAX_VERTEX_COUNT * colors.size(), 0);
     int cost = 0;
     for (auto from : graph.vertex_ids()) {
@@ -50,17 +46,6 @@ class EnemyTable {
     }
     return cost / 2;
   }
-
-  // void shift(int vertex_id, int new_color) {
-  //   auto& v = graph[vertex_id];
-  //   auto old_color = v.color;
-  //   this->total_cost +=
-  //       table(vertex_id, new_color) - table(vertex_id, old_color);
-  //   for (auto victim_id : graph.edges(vertex_id)) {
-  //     int new_gen = table(victim_id, old_color)--;
-  //     int old_die = table(victim_id, new_color)++;
-  //   }
-  // }
 
   bool check(const Graph& graph, const vector<int>& colors, int cost) const {
     EnemyTable eng;

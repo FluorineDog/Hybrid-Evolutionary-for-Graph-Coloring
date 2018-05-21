@@ -8,9 +8,10 @@ add_compile_options(-Werror -Wall -pedantic -Wno-unused)
 add_compile_options(-Ofast)
 
 add_definitions(-DDOG_DEBUG)
-add_definitions(-DSTRIP_NOTIFY=20000)
-add_definitions(-DSTRIP=10000)
-add_definitions(-DPOPULATION=5)
+add_definitions(-DSTRIP_NOTIFY=100000)
+add_definitions(-DSTRIP=20000)
+add_definitions(-DPOPULATION=20)
+add_definitions(-DSCALE=5)
 
 # for debugging vector, out_of_bound will be caught
 # add_definitions(-D_GLIBCXX_DEBUG)
