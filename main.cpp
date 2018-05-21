@@ -12,7 +12,7 @@ int main(int argc, char* argv[]) {
   } else {
     // cin.redirect("data/DSJC500.5.col");
     // preset_color_count = 49;
-    cout << "usage: \n\t" << argv[0] << " <file> <color_count> [rand_seed]"
+    cerr << "usage: \n\t" << argv[0] << " <file> <color_count> [rand_seed]"
          << endl;
     exit(-1);
   }
@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
     }
   }
   if (vertex_count == 0) {
-    cout << "edge info not found" << endl;
+    cerr << "edge info not found" << endl;
     exit(-1);
   }
 
