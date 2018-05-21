@@ -4,13 +4,12 @@
 #include "wheel.h"
 struct Vertex {
   int edge_beg;
-  // int color;
   Vertex() : edge_beg(0) {}
 };
 
 struct Edge {
   int next;
-  int to;  // vertex
+  int to;  // vertex_id
   Edge(int next, int to) : next(next), to(to) {}
   int dest() { return to; }
 };
@@ -64,9 +63,6 @@ class Graph : public vector<Vertex> {
     }
     return g_tmp;
   }
-  // void set_color_count(int count) { color_count = count; }
-
-  // int get_color_count() const { return color_count; }
 
  private:
   class Edges {
@@ -75,10 +71,6 @@ class Graph : public vector<Vertex> {
      public:
       Iterator(const Graph& graph, Edge edge) : edge(edge), graph(graph) {}
       int operator*() const { return edge.to; }
-      // bool operator==(const Iterator& other) const { return !(*this !=
-      // other); } bool operator!=(const Iterator& other) const {
-      //   return edge.next != -1;
-      // }
       bool operator!=(int other) const { return edge.next != other; }
 
       Iterator operator++() {
@@ -93,7 +85,6 @@ class Graph : public vector<Vertex> {
 
     Edges(const Graph& graph, int beg) : graph(graph), beg(beg) {}
     Iterator begin() const { return Iterator(graph, graph.edge_begin_id(beg)); }
-    // Iterator end() const { return Iterator(graph, graph.edge_begin_id(0)); }
     static constexpr int end() { return -1; }
 
    private:
@@ -113,63 +104,4 @@ class Graph : public vector<Vertex> {
 
  private:
   vector<Edge> m_edges;
-  // int color_count;
 };
-
-// #include <set>
-// Graph GTX(Graph&& a, Graph& b) {
-//   int count = a.get_color_count();
-//   std::vector<std::set<int>> vec_color_a(count);
-//   std::vector<std::set<int>> vec_color_b(count);
-//   std::set<std::pair<int, int>> big_a;
-//   std::set<std::pair<int, int>> big_b;
-
-//   for (auto v_id : a.vertex_ids()) {
-//     vec_color_a[a[v_id].color].insert(v_id);
-//   }
-
-//   for (auto v_id : b.vertex_ids()) {
-//     vec_color_b[b[v_id].color].insert(v_id);
-//   }
-
-//   for (auto iter : Range(count)) {
-//     auto& s1 = vec_color_a[iter];
-//     big_a.insert(std::make_pair(s1.size(), iter));
-//     auto& s2 = vec_color_b[iter];
-//     big_b.insert(std::make_pair(s2.size(), iter));
-//   }
-
-//   std::stack<std::set<int>> record;
-//   for (int iter : Range(count)) {
-//     auto [sz, id] = *--big_a.end();
-//     big_a.erase(std::make_pair(sz, id));
-//     auto& s = vec_color_a[id];
-//     for (auto v_id : s) {
-//       auto color = b[v_id].color;
-//       auto& affected_set = vec_color_b[color];
-//       int affected_size = affected_set.size();
-//       affected_set.erase(color);
-//       big_b.erase(std::make_pair(affected_size, color));
-//       big_b.insert(std::make_pair(affected_size - 1, color));
-//     }
-//     record.emplace(std::move(s));
-//     s.clear();
-//     std::swap(big_a, big_b);
-//     std::swap(vec_color_a, vec_color_b);
-//     std::swap(a, b);
-//   }
-//   if (count % 2 == 1) {
-//     std::swap(a, b);
-//   }
-
-//   Graph res = std::move(a);
-//   int color = 0;
-//   while (!record.empty()) {
-//     for (auto x : record.top()) {
-//       res[x].color = color;
-//     }
-//     color++;
-//     record.pop();
-//   }
-//   return res;
-// }
