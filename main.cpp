@@ -46,6 +46,15 @@ int main(int argc, char* argv[]) {
     exit(-1);
   }
 
+  if (POPULATION < 2) {
+    cerr << "population must be at least 2. "  //
+         << "Change POPULATION("    //
+         << MAX_COLOR_COUNT              //
+         << ") in CMakeLists.txt "       //
+         << endl;
+    exit(-1);
+  }
+
   int vertex_count = -1, edge_count;
 
   std::string line; 
