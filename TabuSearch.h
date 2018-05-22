@@ -36,7 +36,7 @@ class TabuSearch {
   int getCurrentCost() const { return curr_cost; }
 
   int getHistoryCost() const { return hist_cost; }
-  const vertor<int>& getColors() const { return colors; }
+  const vector<int>& getColors() const { return colors; }
 
  public:
   static vector<int> GPX(const TabuSearch& ts1, const TabuSearch& ts2,

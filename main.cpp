@@ -1,6 +1,13 @@
 
 #include <chrono>
+#include <fstream>
+#include <iostream>
+#include <vector>
 #include "TabuSearch.h"
+using std::cerr;
+using std::cout;
+using std::endl;
+using std::vector;
 
 static std::default_random_engine e(67);
 std::pair<int, int> localSearch(TabuSearch& engine, int iterBase, int scale,
@@ -14,19 +21,15 @@ struct {
 } global;
 
 int main(int argc, char* argv[]) {
-  int preset_color_count;
-  if (argc >= 3) {
-    // fake cin for I/O speed
-    cin.redirect(argv[1]);
-
-    preset_color_count = strtol(argv[2], nullptr, 10);
-  } else {
-    // cin.redirect("data/DSJC500.5.col");
-    // preset_color_count = 49;
+  if (argc < 3) {
     cerr << "usage: \n\t" << argv[0] << " <file> <color_count> [rand_seed]"
          << endl;
     exit(-1);
   }
+  // fake fin for I/O speed
+  std::ifstream fin(argv[1]);
+  int preset_color_count = strtol(argv[2], nullptr, 10);
+
   if (argc >= 4) {
     global.seed = strtol(argv[3], nullptr, 10);
     e.seed(global.seed);
@@ -43,30 +46,30 @@ int main(int argc, char* argv[]) {
     exit(-1);
   }
 
-  char ch;
   int vertex_count = -1, edge_count;
 
-  while (true) {
-    // this cin will skip ' ' and '\n'
+  std::string line; 
+  while (std::getline(fin, line)) {
+    // this fin will skip ' ' and '\n'
     // see wheel.h for reference
-    cin >> ch;
-    if (ch == 'c') {
+
+    if (line[0] == 'c') {
       // commnets
-      cin.skipline();
-    } else if (ch == 'p') {
+      continue;
+    } else if (line[0] == 'p') {
       // property
-      char tmp[20];
-      cin >> tmp >> vertex_count >> edge_count;
+      sscanf(line.c_str(), "%*s%*s%d%d", &vertex_count, &edge_count);
       break;
     } else {
       // not regnogizable
       continue;
     }
   }
-  if (vertex_count == 0) {
+  if (vertex_count == -1) {
     cerr << "edge info not found" << endl;
     exit(-1);
   }
+  std::cerr << vertex_count;
 
   if (vertex_count > MAX_VERTEX_COUNT) {
     cerr << "vertex limiited exceeded. "  //
@@ -79,10 +82,9 @@ int main(int argc, char* argv[]) {
 
   Graph graph(vertex_count, edge_count * 2);
   for (int i = 0; i < edge_count; ++i) {
-    while (getchar() != 'e') {
-    }
+    char tmp[10];
     int from, to;
-    cin >> from >> to;
+    fin >> tmp >> from >> to;
     --from;
     --to;
     graph.add_edge(from, to);
@@ -153,7 +155,7 @@ int main(int argc, char* argv[]) {
       << global.seed << ", "              // RandSeed
       << duration.count() << "s, "        // Duration
       << iter_count << ", "               // IterCount
-      << eng.getCurrentCost() << ", "     // Optima
+      << eng.getHistoryCost() << ", "     // Optima
       ;
   auto& colors = eng.getColors();
   std::cout << "(" << global.color << ")";
@@ -180,7 +182,7 @@ std::pair<int, int> localSearch(TabuSearch& engine, int iterBase, int scale,
           << "iterBase: " << iterBase << endl  //
           << "iterI: " << iterI << endl        //
           << "success " << endl;
-      output_answer(iterBase * POPULATION + ctz_id * STRIP, engine);
+      output_answer(iterBase * POPULATION + ctz_id * STRIP + iterI, engine);
     }
   }
   int hist_best = engine.getHistoryCost();

@@ -1,6 +1,9 @@
 #define private public
 #include "TabuSearch.h"
 #include "graph.h"
+#include <iostream>
+using std::cout;
+using std::endl;
 int main() {
   Graph graph(10);
   vector<int> c1{
