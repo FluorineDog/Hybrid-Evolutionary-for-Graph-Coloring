@@ -12,6 +12,9 @@ make -C build || exit
 ./build/main data/${FILE} ${COLOR} 10 >> log/${FILE}-${COLOR}.log
 ./build/main data/${FILE} ${COLOR} 20 >> log/${FILE}-${COLOR}.log
 ./build/main data/${FILE} ${COLOR} 30 >> log/${FILE}-${COLOR}.log
+
+
+# comment "exit" to add second pass
 exit
 
 CONFIG="-DSTRIP=10000 -DSTRIP_NOTIFY=50000 -DPOPULATION=5"
@@ -26,5 +29,4 @@ make -C build || exit
 ./build/main data/${FILE} ${COLOR} 10 >> log/${FILE}-${COLOR}.log
 ./build/main data/${FILE} ${COLOR} 20 >> log/${FILE}-${COLOR}.log
 ./build/main data/${FILE} ${COLOR} 30 >> log/${FILE}-${COLOR}.log
-
 
