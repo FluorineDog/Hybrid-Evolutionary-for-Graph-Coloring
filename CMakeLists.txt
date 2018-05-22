@@ -8,8 +8,8 @@ add_compile_options(-Werror -Wall -pedantic -Wno-unused)
 add_compile_options(-Ofast)
 
 # add_definitions(-DDOG_DEBUG)
-# add_definitions(-DSTRIP_NOTIFY=20000)
-# add_definitions(-DSTRIP=10000)
+# add_definitions(-DSTRIDE_NOTIFY=20000)
+# add_definitions(-DSTRIDE=10000)
 # add_definitions(-DPOPULATION=5)
 # add_definitions(-DSCALE=1)
 

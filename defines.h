@@ -3,12 +3,12 @@
 #define SCALE 1
 #endif
 
-#ifndef STRIP
-#define STRIP 10000
+#ifndef STRIDE
+#define STRIDE 10000
 #endif
 
-#ifndef STRIP_NOTIFY
-#define STRIP_NOTIFY 20000
+#ifndef STRIDE_NOTIFY
+#define STRIDE_NOTIFY 20000
 #endif
 
 #ifndef POPULATION

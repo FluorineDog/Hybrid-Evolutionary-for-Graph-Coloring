@@ -119,7 +119,7 @@ int main(int argc, char* argv[]) {
   }
 
   int last_worstID = -1;
-  for (int iter = 0; iter < 100000000; iter += STRIP) {
+  for (int iter = 0; iter < 100000000; iter += STRIDE) {
     int best[2] = {INF, INF}, worst = 0;
     int bestID[2] = {-1, -1}, worstID = -1;
     for (auto ctz_id : Range(POPULATION)) {
@@ -165,7 +165,7 @@ int main(int argc, char* argv[]) {
       << date_buf << ", "                 // Date
       << global.filename << ", "          // Instance
       << "HEA(POPULATION=" << POPULATION  // Algorithm
-      << "|STRIP=" << STRIP               // Algorithm
+      << "|STRIDE=" << STRIDE               // Algorithm
       << "|SCALE=" << SCALE               // Algorithm
       << "), "                            // Algorithm
                                           //
@@ -187,7 +187,7 @@ int main(int argc, char* argv[]) {
 std::pair<int, int> localSearch(TabuSearch& engine, int iterBase, int scale,
                                 int ctz_id) {
   int best = INF;
-  for (int iterI = 0; iterI < scale * STRIP; ++iterI) {
+  for (int iterI = 0; iterI < scale * STRIDE; ++iterI) {
     auto iter = iterBase + iterI;
     auto [v, c] = engine.pick_move(iter);
     int old_color = engine.shift(v, c);
@@ -199,11 +199,11 @@ std::pair<int, int> localSearch(TabuSearch& engine, int iterBase, int scale,
           << "iterBase: " << iterBase << endl  //
           << "iterI: " << iterI << endl        //
           << "success " << endl;
-      output_answer(iterBase * POPULATION + ctz_id * STRIP + iterI, engine);
+      output_answer(iterBase * POPULATION + ctz_id * STRIDE + iterI, engine);
     }
   }
   int hist_best = engine.getHistoryCost();
-  if (iterBase % STRIP_NOTIFY == 0) {
+  if (iterBase % STRIDE_NOTIFY == 0) {
     std::cerr                  //
         << "" << ctz_id        //
         << ": " << best        //
