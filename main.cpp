@@ -21,6 +21,12 @@ struct {
 } global;
 
 int main(int argc, char* argv[]) {
+#ifdef DOG_DEBUG
+  // fake fin for I/O speed
+  std::ifstream fin("data/DSJC500.9.col");
+  int preset_color_count = 126;
+  global.filename = "data/DSJC500.9.col";
+#else
   if (argc < 3) {
     cerr << "usage: \n\t" << argv[0] << " <file> <color_count> [rand_seed]"
          << endl;
@@ -28,14 +34,14 @@ int main(int argc, char* argv[]) {
   }
   // fake fin for I/O speed
   std::ifstream fin(argv[1]);
+  global.filename = argv[1];
   int preset_color_count = strtol(argv[2], nullptr, 10);
-
+#endif
   if (argc >= 4) {
     global.seed = strtol(argv[3], nullptr, 10);
     e.seed(global.seed);
   }
   global.color = preset_color_count;
-  global.filename = argv[1];
 
   if (global.color > MAX_COLOR_COUNT) {
     cerr << "color limiited exceeded. "  //
@@ -48,16 +54,16 @@ int main(int argc, char* argv[]) {
 
   if (POPULATION < 2) {
     cerr << "population must be at least 2. "  //
-         << "Change POPULATION("    //
-         << MAX_COLOR_COUNT              //
-         << ") in CMakeLists.txt or run.sh"       //
+         << "Change POPULATION("               //
+         << MAX_COLOR_COUNT                    //
+         << ") in CMakeLists.txt or run.sh"    //
          << endl;
     exit(-1);
   }
 
   int vertex_count = -1, edge_count;
 
-  std::string line; 
+  std::string line;
   while (std::getline(fin, line)) {
     // this fin will skip ' ' and '\n'
     // see wheel.h for reference
@@ -93,7 +99,9 @@ int main(int argc, char* argv[]) {
   for (int i = 0; i < edge_count; ++i) {
     char tmp[10];
     int from, to;
-    fin >> tmp >> from >> to;
+    if (!(fin >> tmp >> from >> to)) {
+      break;
+    }
     --from;
     --to;
     graph.add_edge(from, to);
@@ -204,3 +212,5 @@ std::pair<int, int> localSearch(TabuSearch& engine, int iterBase, int scale,
   }
   return std::make_pair(best, hist_best);
 }
+
+
