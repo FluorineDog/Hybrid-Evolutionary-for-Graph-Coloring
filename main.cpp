@@ -1,13 +1,24 @@
 
+#include <chrono>
 #include "TabuSearch.h"
 
 static std::default_random_engine e(67);
-std::pair<int, int> localSearch(TabuSearch& engine, int iterBase, int scale);
+std::pair<int, int> localSearch(TabuSearch& engine, int iterBase, int scale,
+                                int ID);
+using Clock = std::chrono::time_point<std::chrono::system_clock>;
+struct {
+  Clock begin_time;
+  std::string filename;
+  int color;
+  int seed = 67;
+} global;
+
 int main(int argc, char* argv[]) {
   int preset_color_count;
   if (argc >= 3) {
     // fake cin for I/O speed
     cin.redirect(argv[1]);
+
     preset_color_count = strtol(argv[2], nullptr, 10);
   } else {
     // cin.redirect("data/DSJC500.5.col");
@@ -17,11 +28,24 @@ int main(int argc, char* argv[]) {
     exit(-1);
   }
   if (argc >= 4) {
-    e.seed(strtol(argv[3], nullptr, 10));
+    global.seed = strtol(argv[3], nullptr, 10);
+    e.seed(global.seed);
+  }
+  global.color = preset_color_count;
+  global.filename = argv[1];
+
+  if (global.color > MAX_COLOR_COUNT) {
+    cerr << "color limiited exceeded. "  //
+         << "Change MAX_COLOR_COUNT("    //
+         << MAX_COLOR_COUNT              //
+         << ") in CMakeLists.txt "       //
+         << endl;
+    exit(-1);
   }
 
   char ch;
   int vertex_count = -1, edge_count;
+
   while (true) {
     // this cin will skip ' ' and '\n'
     // see wheel.h for reference
@@ -44,6 +68,15 @@ int main(int argc, char* argv[]) {
     exit(-1);
   }
 
+  if (vertex_count > MAX_VERTEX_COUNT) {
+    cerr << "vertex limiited exceeded. "  //
+         << "Change MAX_VERTEX_COUNT("    //
+         << MAX_VERTEX_COUNT              //
+         << ") in CMakeLists.txt "        //
+         << endl;
+    exit(-1);
+  }
+
   Graph graph(vertex_count, edge_count * 2);
   for (int i = 0; i < edge_count; ++i) {
     while (getchar() != 'e') {
@@ -56,23 +89,24 @@ int main(int argc, char* argv[]) {
     graph.add_edge(to, from);
   }
   graph = graph.optimize();
-  cout << "searching " << preset_color_count << endl;
-
+  cerr << "searching " << preset_color_count << endl;
+  {
+    using namespace std::chrono;
+    global.begin_time = system_clock::now();
+  }
   vector<TabuSearch> citizens;
   for (int i = 0; i < POPULATION; ++i) {
     citizens.emplace_back(graph, preset_color_count, i);
   }
 
-  // TabuSearch engine(graph, preset_color_count);
   int last_worstID = -1;
-  for (int iter = 0; iter < 1000000000; iter += STRIP) {
+  for (int iter = 0; iter < 100000000; iter += STRIP) {
     int best[2] = {INF, INF}, worst = 0;
     int bestID[2] = {-1, -1}, worstID = -1;
     for (auto ctz_id : Range(POPULATION)) {
       auto& ctz = citizens[ctz_id];
-      if (iter % STRIP_NOTIFY == 0) cout << ctz_id;
       int scale = (last_worstID == ctz_id) ? SCALE : 1;
-      auto [cost, hist] = localSearch(ctz, iter, scale);
+      auto [cost, hist] = localSearch(ctz, iter, scale, ctz_id);
       int best_finder = cost;  // encourage blood
       if (best_finder < best[1]) {
         best[1] = best_finder;
@@ -93,11 +127,46 @@ int main(int argc, char* argv[]) {
     citizens[worstID].acceptConfig(std::move(TabuSearch::GPX(ctz1, ctz2, e)));
     last_worstID = worstID;
   }
-  return 0;
+
+  // return 0;
+}
+
+#include <iostream>
+[[noreturn]] void output_answer(int iter_count, TabuSearch& eng) {
+  using namespace std::chrono;
+  Clock end_time = system_clock::now();
+  duration<double> duration = end_time - global.begin_time;
+  char date_buf[100];
+  {
+    auto tmp = system_clock::to_time_t(end_time);
+    auto tmp_p = localtime(&tmp);
+    strftime(date_buf, 100, "%Y-%M-%d %T", tmp_p);
+  }
+  std::cout                               //
+      << date_buf << ", "                 // Date
+      << global.filename << ", "          // Instance
+      << "HEA(POPULATION=" << POPULATION  // Algorithm
+      << "|STRIP=" << STRIP               // Algorithm
+      << "|SCALE=" << SCALE               // Algorithm
+      << "), "                            // Algorithm
+                                          //
+      << global.seed << ", "              // RandSeed
+      << duration.count() << "s, "        // Duration
+      << iter_count << ", "               // IterCount
+      << eng.getCurrentCost() << ", "     // Optima
+      ;
+  auto& colors = eng.getColors();
+  std::cout << "(" << global.color << ")";
+  for (auto c : colors) {
+    std::cout << c << " ";
+  }
+  std::cout << std::endl;
+  exit(-1);
 }
 
 // return <curr_best, hist_best>
-std::pair<int, int> localSearch(TabuSearch& engine, int iterBase, int scale) {
+std::pair<int, int> localSearch(TabuSearch& engine, int iterBase, int scale,
+                                int ctz_id) {
   int best = INF;
   for (int iterI = 0; iterI < scale * STRIP; ++iterI) {
     auto iter = iterBase + iterI;
@@ -107,17 +176,18 @@ std::pair<int, int> localSearch(TabuSearch& engine, int iterBase, int scale) {
     best = std::min(cost, best);
     engine.tabu(v, old_color, iter + e() % 10 + cost);
     if (cost == 0) {
-      cout                                     //
+      std::cerr                                //
           << "iterBase: " << iterBase << endl  //
           << "iterI: " << iterI << endl        //
           << "success " << endl;
-      exit(0);
+      output_answer(iterBase * POPULATION + ctz_id * STRIP, engine);
     }
   }
   int hist_best = engine.getHistoryCost();
   if (iterBase % STRIP_NOTIFY == 0) {
-    cout                       //
-        << "<=>" << best       //
+    std::cerr                  //
+        << "" << ctz_id        //
+        << ": " << best        //
         << "<=>" << hist_best  //
         << endl;
   }

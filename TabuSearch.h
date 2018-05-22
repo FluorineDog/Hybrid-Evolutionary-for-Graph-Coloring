@@ -36,6 +36,7 @@ class TabuSearch {
   int getCurrentCost() const { return curr_cost; }
 
   int getHistoryCost() const { return hist_cost; }
+  const vertor<int>& getColors() const { return colors; }
 
  public:
   static vector<int> GPX(const TabuSearch& ts1, const TabuSearch& ts2,
@@ -151,7 +152,7 @@ inline vector<int> TabuSearch::GPX(  //
     const TabuSearch& ts2,           //
     std::default_random_engine& e    //
 ) {
-// #define static
+  // #define static
   std::reference_wrapper<const vector<int>>  //
       replica[] = {ts1.colors, ts2.colors};
   int vertex_count = replica[0].get().size();
