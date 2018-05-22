@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
     cerr << "population must be at least 2. "  //
          << "Change POPULATION("    //
          << MAX_COLOR_COUNT              //
-         << ") in CMakeLists.txt "       //
+         << ") in CMakeLists.txt or run.sh"       //
          << endl;
     exit(-1);
   }
@@ -139,7 +139,7 @@ int main(int argc, char* argv[]) {
     last_worstID = worstID;
   }
 
-  // return 0;
+  return 0;
 }
 
 #include <iostream>
