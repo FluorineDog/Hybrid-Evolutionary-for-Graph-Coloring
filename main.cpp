@@ -159,7 +159,7 @@ int main(int argc, char* argv[]) {
   {
     auto tmp = system_clock::to_time_t(end_time);
     auto tmp_p = localtime(&tmp);
-    strftime(date_buf, 100, "%Y-%M-%d %T", tmp_p);
+    strftime(date_buf, 100, "%Y-%m-%d %T", tmp_p);
   }
   std::cout                               //
       << date_buf << ", "                 // Date
